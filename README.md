@@ -5,16 +5,25 @@
 
   High Level Description: In order to direct the robot to drive in a square, I directed it to move forward for 5 seconds and make a 90 degree turn four times. I used the Twist message, specifically the linear x to move forward and the angular z to make turns.
 
-  Code Explanation: I created a *DriveSquare* class, which has the following functions:
-    * *turn* -  directs robot to turn 90 degrees by publishing a Twist message with z angular velocity of 0.5, waiting approximately pi seconds (since angular velocity is 1/2 and we want to travel pi/2), and then publishing the Twist message with the z angular velocity set back to 0
+  Code Explanation: I created a `DriveSquare` class, which has the following functions:
+    * `turn` -  directs robot to turn 90 degrees by publishing a Twist message with z angular velocity of 0.5, waiting approximately pi seconds (since angular velocity is 1/2 and we want to travel pi/2), and then publishing the Twist message with the z angular velocity set back to 0
 
-    * *go* - directs robot to drive forward for 5 seconds by publishing a Twist message with x linear velocity of 0.2, waiting 5 seconds, then publishing the Twist with the x linear velocity set back to 0
+    * `go` - directs robot to drive forward for 5 seconds by publishing a Twist message with x linear velocity of 0.2, waiting 5 seconds, then publishing the Twist with the x linear velocity set back to 0
 
-    * *run* - repeats the turn and go movements four times
+    * `run` - repeats the turn and go movements four times
 
   ![driving in square](./drive_square.gif)
 
 * **Person Follower**
+
+  High Level Description: In order to direct the robot to follow the person (or object), I used the LaserScan message data from the LiDAR to determine the current state of the robot and person and proportional control to determine how the robot should move. For the linear movement, I directed it to move at a constant velocity until it was less than 0.4m away from the person. For the angular movement, I used the current angle from the robot to the object (e.g. 0 degrees is directly in front of the robot, 90 degrees is directly to the left of the robot, etc.) as the process variable and 0 degrees as the desired set-point to determine the necessary angular velocity to turn the robot towards the person.
+
+  Code Explanation: I created a `PersonFollower` class, which has the function `run` to run the node and the function `process_scan`, which:
+    * if there is no object detected, publishes the Twist with 0 angular and linear velocity (so the robot does nothing).
+
+    * if an object is detected, (1) retrieves the current angle by getting the min of the ranges and using the list index of the min as the angle, (2) sets the linear velocity to 0.3 by default or 0 if the object is within 0.4m of the robot, (3) determines the error signal as the difference between current angle and desired angle of 0 degrees, (4) sets the angular velocity using the error signal and a k_p of 0.01, and (5) publishes the Twist.
+
+  ![follower person](./person_follower.gif)
 * **Wall Follower**
 
 ### Challenges
