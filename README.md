@@ -24,7 +24,21 @@
     * if an object is detected, (1) retrieves the current angle by getting the min of the ranges and using the list index of the min as the angle, (2) sets the linear velocity to 0.3 by default or 0 if the object is within 0.4m of the robot, (3) determines the error signal as the difference between current angle and desired angle of 0 degrees, (4) sets the angular velocity using the error signal and a k_p of 0.01, and (5) publishes the Twist.
 
   ![follower person](./person_follower.gif)
+
 * **Wall Follower**
+
+  High Level Description: In order to direct the robot to follow the wall, I used the LaserScan message data from the LiDAR to determine the current positions of the walls to the front and left of the robot. I used proportional control to set angular velocity so that if the robot strays of the path that is 0.5m away from the left wall it is following, then it will turn towards the path to try to get back on the path. I used the difference between the max range and the distance from the front of the robot to the wall to make the turns.
+
+  Code Explanation: I created a `WallFollower` class with a `run` function to run the node and a `process_scan` function, which:
+    * retrieves the distance to any object directly in front of or to the left of the robot from the LaserScan,
+
+    * uses proportional control to control the angular velocity to try to stay on the path 0.5m from the left wall if there is no wall directly in front of the robot,
+
+    * uses the distance from the front wall to determine angular velocity to make a right turn if there is a wall directly in front of the robot,
+
+    * and publishes a constant linear velocity and the calculated angular velocity to the cmd_vel topic.
+
+  ![wall follower](./wall_follower.gif)
 
 ### Challenges
 
